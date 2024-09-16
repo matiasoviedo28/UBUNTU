@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Solicitar datos al usuario
+read -p "Ingrese nombre del directorio del proyecto (ejemplo: BVM, FWI): " proy
 read -p "Ingrese el NIC a utilizar (ejemplo: eth0, ens33): " nic
 read -p "Ingrese el nombre de dominio (por ejemplo, ejemplo.com): " domain
 read -p "Ingrese la IP pública del servidor (para configurar DNS): " public_ip
@@ -11,10 +12,6 @@ sudo apt update && sudo apt upgrade -y
 
 # Instalar Apache y OpenSSL
 sudo apt install apache2 openssl -y
-
-# Crear directorio para el sitio
-sudo mkdir -p /home/ubuntu/BVM
-sudo chown -R ubuntu:ubuntu /home/ubuntu/BVM
 
 # Configurar Apache
 if [ "$access_type" = "lan" ]; then
@@ -27,9 +24,9 @@ sudo tee /etc/apache2/sites-available/$domain.conf <<EOF
 <VirtualHost $listen_address:80>
     ServerAdmin webmaster@$domain
     ServerName $domain
-    DocumentRoot /home/ubuntu/BVM
+    DocumentRoot /home/ubuntu/$proy
 
-    <Directory /home/ubuntu/BVM>
+    <Directory /home/ubuntu/$proy>
         Options Indexes FollowSymLinks
         AllowOverride All
         Require all granted
@@ -53,13 +50,13 @@ sudo tee /etc/apache2/sites-available/$domain-ssl.conf <<EOF
 <VirtualHost $listen_address:443>
     ServerAdmin webmaster@$domain
     ServerName $domain
-    DocumentRoot /home/ubuntu/BVM
+    DocumentRoot /home/ubuntu/$proy
 
     SSLEngine on
     SSLCertificateFile /etc/ssl/certs/$domain.crt
     SSLCertificateKeyFile /etc/ssl/private/$domain.key
 
-    <Directory /home/ubuntu/BVM>
+    <Directory /home/ubuntu/$proy>
         Options Indexes FollowSymLinks
         AllowOverride All
         Require all granted
