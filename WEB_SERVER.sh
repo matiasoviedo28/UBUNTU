@@ -7,6 +7,17 @@ read -p "Ingrese el nombre de dominio (por ejemplo, ejemplo.com): " domain
 read -p "Ingrese la IP pública del servidor (para configurar DNS): " public_ip
 read -p "¿La web será accesible desde el exterior o solo en LAN? (exterior/lan): " access_type
 
+# Verificar si el directorio existe
+directory="/home/ubuntu/$proy"
+if [ ! -d "$proy" ]; then
+    echo "El directorio $proy no existe. Creándolo ahora..."
+    sudo mkdir -p "$proy"
+    sudo chown ubuntu:ubuntu "$proy"
+    echo "Directorio $proy creado y permisos ajustados."
+else
+    echo "El directorio $proy ya existe."
+fi
+
 # Actualizar y hacer upgrade del sistema
 sudo apt update && sudo apt upgrade -y
 
