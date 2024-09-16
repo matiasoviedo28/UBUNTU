@@ -12,6 +12,10 @@ sudo apt update && sudo apt upgrade -y
 # Instalar Apache y OpenSSL
 sudo apt install apache2 openssl -y
 
+# Crear directorio para el sitio
+sudo mkdir -p /home/ubuntu/BVM
+sudo chown -R ubuntu:ubuntu /home/ubuntu/BVM
+
 # Configurar Apache
 if [ "$access_type" = "lan" ]; then
     listen_address="127.0.0.1"
