@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Solicitar datos al usuario
-echo "antes de ejecutar el script, introduce tu index.html en /home/ubuntu/BVM"
-read -p "Ingrese la interfaz de red a utilizar (ejemplo: eth0, ens33): " nic
+read -p "Ingrese el NIC a utilizar (ejemplo: eth0, ens33): " nic
 read -p "Ingrese el nombre de dominio (por ejemplo, ejemplo.com): " domain
 read -p "Ingrese la IP pública del servidor (para configurar DNS): " public_ip
+read -p "¿La web será accesible desde el exterior o solo en LAN? (exterior/lan): " access_type
 
 # Actualizar y hacer upgrade del sistema
 sudo apt update && sudo apt upgrade -y
@@ -13,8 +13,14 @@ sudo apt update && sudo apt upgrade -y
 sudo apt install apache2 openssl -y
 
 # Configurar Apache
+if [ "$access_type" = "lan" ]; then
+    listen_address="127.0.0.1"
+else
+    listen_address="*"
+fi
+
 sudo tee /etc/apache2/sites-available/$domain.conf <<EOF
-<VirtualHost *:80>
+<VirtualHost $listen_address:80>
     ServerAdmin webmaster@$domain
     ServerName $domain
     DocumentRoot /home/ubuntu/BVM
@@ -40,7 +46,7 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/privat
 # Configurar Apache para HTTPS
 sudo tee /etc/apache2/sites-available/$domain-ssl.conf <<EOF
 <IfModule mod_ssl.c>
-<VirtualHost *:443>
+<VirtualHost $listen_address:443>
     ServerAdmin webmaster@$domain
     ServerName $domain
     DocumentRoot /home/ubuntu/BVM
